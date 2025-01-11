@@ -9,7 +9,7 @@ import (
 	"github.com/hashicorp/vault/shamir"
 )
 
-var baseEncoder *base32.Encoding = base32.NewEncoding("ABCDEFGHIJKLMNPRSTUVWXYZ23456789").WithPadding(base32.NoPadding)
+var baseEncoder *base32.Encoding = base32.NewEncoding("ABCDEFGHIJKLMNOPQRSTUVWXYZ34679+").WithPadding(base32.NoPadding)
 var crcTable *crc32.Table = crc32.MakeTable(crc32.Castagnoli)
 
 func ShamirSplit(shares int, threshold int, secret string, groupSize int) ([]string, error) {
@@ -47,7 +47,14 @@ func ShamirSplit(shares int, threshold int, secret string, groupSize int) ([]str
 func ShamirCombine(shards []string) (string, error) {
 	shardBytes := make([][]byte, len(shards))
 	for i, shard := range shards {
-		decodedShard, err := baseEncoder.DecodeString(strings.ReplaceAll(shard, " ", ""))
+		shard = strings.ToUpper(shard)
+		shard = strings.ReplaceAll(shard, " ", "")
+		shard = strings.ReplaceAll(shard, "0", "O") // replace 0 to O (common mistake)
+		shard = strings.ReplaceAll(shard, "1", "I") // replace 1 to I (common mistake)
+		shard = strings.ReplaceAll(shard, "2", "Z") // replace 2 to Z (common mistake)
+		shard = strings.ReplaceAll(shard, "5", "S") // replace 5 to S (common mistake)
+		shard = strings.ReplaceAll(shard, "8", "B") // replace 8 to B (common mistake)
+		decodedShard, err := baseEncoder.DecodeString(shard)
 		if err != nil {
 			return "", fmt.Errorf("error in shard %d: %v", i+1, err)
 		}
