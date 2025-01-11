@@ -58,6 +58,7 @@ var (
 				Action: func(ctx context.Context, cmd *cli.Command) error {
 					return runSplit(ctx, cmd)
 				},
+				UsageText: "shamir-msg split [options]",
 			},
 			{
 				Name:  "combine",
@@ -66,6 +67,7 @@ var (
 				Action: func(ctx context.Context, cmd *cli.Command) error {
 					return runCombine(ctx, cmd)
 				},
+				UsageText: "shamir-msg combine [options]",
 			},
 			{
 				Name:  "run",

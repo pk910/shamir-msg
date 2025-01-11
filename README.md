@@ -32,7 +32,7 @@ NAME:
    shamir-msg split - Split a secret into shards
 
 USAGE:
-   shamir-msg split [command [command options]]
+   shamir-msg split [options]
 
 OPTIONS:
    --keys value, -k value        The number of total key shards to generate (default: 3)
@@ -65,7 +65,7 @@ NAME:
    shamir-msg combine - Combine shards into the original secret
 
 USAGE:
-   shamir-msg combine [command [command options]]
+   shamir-msg combine [options]
 
 OPTIONS:
    --shard value, -s value [ --shard value, -s value ]  The shards to recombine into the secret
