@@ -35,7 +35,7 @@ USAGE:
    shamir-msg split [options]
 
 OPTIONS:
-   --keys value, -k value        The number of total key shards to generate (default: 3)
+   --keys value, -k value        The total number of key shards to generate (default: 3)
    --threshold value, -t value   The min number of shards needed to re-assemble the secret (default: 2)
    --secret value, -s value      The secret to split into shards
    --group-size value, -g value  Split output into groups of this size and separate with a space (default: 6)

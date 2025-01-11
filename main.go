@@ -14,7 +14,7 @@ var (
 	keysFlag = &cli.IntFlag{
 		Name:    "keys",
 		Aliases: []string{"k"},
-		Usage:   "The number of total key shards to generate",
+		Usage:   "The total number of key shards to generate",
 		Value:   3,
 	}
 	thresholdFlag = &cli.IntFlag{
