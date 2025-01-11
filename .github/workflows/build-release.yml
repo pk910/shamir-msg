@@ -64,8 +64,15 @@ jobs:
         release_name: "v${{ inputs.version }}"
         tag_name: "v${{ inputs.version }}"
         body: |
+          ### Major Changes
+          - Add major changes here
+
+          <details>
+            <summary>Full changelog</summary>
+          
           ### Changes
           ${{ steps.changelog.outputs.changelog }}
+          </details>
 
           ### Release Artifacts
           Please read through the [wiki](https://github.com/ethpandaops/shamir-msg/wiki) for setup & configuration instructions.
