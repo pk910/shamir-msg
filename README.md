@@ -4,8 +4,18 @@ Brings the Shamir secret sharing algorithm from Hashicorp Vault to a CLI utility
 
 ## Installation
 
+### Binaries
+See the prebuilt binaries in the [releases](https://github.com/pk910/shamir-msg/releases) section.
+
+### With go
 ```
 go install github.com/pk910/shamir-msg
+shamir-msg help
+```
+
+### With docker
+```
+docker run --rm -it pk910/shamir-msg help
 ```
 
 ## Usage
@@ -24,7 +34,6 @@ COMMANDS:
    run      Run the tool in interactive mode (default)
    help, h  Shows a list of commands or help for one command
 ```
-## Examples
 
 ### Splitting a secret key
 ```
