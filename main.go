@@ -8,6 +8,8 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/urfave/cli/v3"
+
+	"github.com/pk910/shamir-msg/buildinfo"
 )
 
 var (
@@ -91,7 +93,7 @@ func main() {
 func printHeader() {
 	fmt.Printf("##### Shamir Secret Sharing Tool #####\n")
 	fmt.Printf("Split and recombine a secret using Shamir's Secret Sharing\n")
-	fmt.Printf("Version: %v\n", GetBuildVersion())
+	fmt.Printf("Version: %v\n", buildinfo.GetBuildVersion())
 	fmt.Printf("\n")
 }
 
