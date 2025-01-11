@@ -23,6 +23,12 @@ var (
 		Usage:   "The min number of shards needed to re-assemble the secret",
 		Value:   2,
 	}
+	groupSizeFlag = &cli.IntFlag{
+		Name:    "group-size",
+		Aliases: []string{"g"},
+		Usage:   "Split output into groups of this size and separate with a space",
+		Value:   6,
+	}
 	secretFlag = &cli.StringFlag{
 		Name:     "secret",
 		Aliases:  []string{"s"},
@@ -48,7 +54,7 @@ var (
 			{
 				Name:  "split",
 				Usage: "Split a secret into shards",
-				Flags: []cli.Flag{keysFlag, thresholdFlag, secretFlag, quietFlag},
+				Flags: []cli.Flag{keysFlag, thresholdFlag, secretFlag, groupSizeFlag, quietFlag},
 				Action: func(ctx context.Context, cmd *cli.Command) error {
 					return runSplit(ctx, cmd)
 				},
@@ -64,7 +70,7 @@ var (
 			{
 				Name:  "run",
 				Usage: "Run the tool in interactive mode (default)",
-				Flags: []cli.Flag{},
+				Flags: []cli.Flag{groupSizeFlag},
 				Action: func(ctx context.Context, cmd *cli.Command) error {
 					return runInteractive(ctx, cmd)
 				},
@@ -93,8 +99,9 @@ func runSplit(ctx context.Context, cmd *cli.Command) error {
 
 	keys := cmd.Int(keysFlag.Name)
 	threshold := cmd.Int(thresholdFlag.Name)
+	groupSize := cmd.Int(groupSizeFlag.Name)
 
-	shares, err := ShamirSplit(int(keys), int(threshold), cmd.String(secretFlag.Name))
+	shares, err := ShamirSplit(int(keys), int(threshold), cmd.String(secretFlag.Name), int(groupSize))
 	if err != nil {
 		return err
 	}

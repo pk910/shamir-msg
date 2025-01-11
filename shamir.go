@@ -9,10 +9,11 @@ import (
 	"github.com/hashicorp/vault/shamir"
 )
 
-var encoder *base32.Encoding = base32.NewEncoding("ABCDEFGHIJKLMNPRSTUVWXYZ23456789").WithPadding(base32.NoPadding)
+var baseEncoder *base32.Encoding = base32.NewEncoding("ABCDEFGHIJKLMNPRSTUVWXYZ23456789").WithPadding(base32.NoPadding)
+var crcTable *crc32.Table = crc32.MakeTable(crc32.Castagnoli)
 
-func ShamirSplit(shares int, threshold int, secret string) ([]string, error) {
-	crc32val := crc32.Checksum([]byte(secret), crc32.MakeTable(crc32.Castagnoli))
+func ShamirSplit(shares int, threshold int, secret string, groupSize int) ([]string, error) {
+	crc32val := crc32.Checksum([]byte(secret), crcTable)
 
 	secretBytes := []byte{byte(crc32val >> 8), byte(crc32val)}
 	secretBytes = append(secretBytes, []byte(secret)...)
@@ -24,13 +25,17 @@ func ShamirSplit(shares int, threshold int, secret string) ([]string, error) {
 
 	shards := make([]string, shares)
 	for i, shard := range keys {
-		encoded := encoder.EncodeToString(shard)
+		encoded := baseEncoder.EncodeToString(shard)
 		finalStr := ""
-		for i := 0; i < len(encoded); i += 6 {
-			if i+6 < len(encoded) {
-				finalStr += encoded[i:i+6] + " "
-			} else {
-				finalStr += encoded[i:]
+		if groupSize == 0 {
+			finalStr = encoded
+		} else {
+			for i := 0; i < len(encoded); i += groupSize {
+				if i+groupSize < len(encoded) {
+					finalStr += encoded[i:i+groupSize] + " "
+				} else {
+					finalStr += encoded[i:]
+				}
 			}
 		}
 		shards[i] = finalStr
@@ -42,7 +47,7 @@ func ShamirSplit(shares int, threshold int, secret string) ([]string, error) {
 func ShamirCombine(shards []string) (string, error) {
 	shardBytes := make([][]byte, len(shards))
 	for i, shard := range shards {
-		decodedShard, err := encoder.DecodeString(strings.ReplaceAll(shard, " ", ""))
+		decodedShard, err := baseEncoder.DecodeString(strings.ReplaceAll(shard, " ", ""))
 		if err != nil {
 			return "", fmt.Errorf("error in shard %d: %v", i+1, err)
 		}
@@ -58,7 +63,7 @@ func ShamirCombine(shards []string) (string, error) {
 		return "", fmt.Errorf("decoding failed, shards too short")
 	}
 
-	crc32val := crc32.Checksum(decodedSecret[2:], crc32.MakeTable(crc32.Castagnoli))
+	crc32val := crc32.Checksum(decodedSecret[2:], crcTable)
 	if byte(crc32val>>8) != decodedSecret[0] || byte(crc32val) != decodedSecret[1] {
 		return "", fmt.Errorf("checksum mismatch, invalid or not enough shards?")
 	}

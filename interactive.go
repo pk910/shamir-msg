@@ -137,7 +137,8 @@ func runInteractive(ctx context.Context, cmd *cli.Command) error {
 
 		fmt.Printf("\n")
 
-		shares, err := ShamirSplit(int(keys), int(threshold), secret)
+		groupSize := cmd.Int(groupSizeFlag.Name)
+		shares, err := ShamirSplit(int(keys), int(threshold), secret, int(groupSize))
 		if err != nil {
 			return fmt.Errorf("ShamirSplit failed %v", err)
 		}
