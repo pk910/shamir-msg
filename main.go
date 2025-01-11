@@ -1,66 +1,144 @@
 package main
 
 import (
-  "encoding/base64"
-  "fmt"
-  "github.com/hashicorp/vault/shamir"
-  "log"
-  "os"
-  "strings"
-  "flag"
+	"context"
+	"fmt"
+	"log"
+	"os"
+
+	"github.com/fatih/color"
+	"github.com/urfave/cli/v3"
 )
 
-func handleError(err error) {
-  if err != nil {
-    log.Fatalln(err)
-  }
-}
+var (
+	keysFlag = &cli.IntFlag{
+		Name:    "keys",
+		Aliases: []string{"k"},
+		Usage:   "The number of total key shards to generate",
+		Value:   3,
+	}
+	thresholdFlag = &cli.IntFlag{
+		Name:    "threshold",
+		Aliases: []string{"t"},
+		Usage:   "The min number of shards needed to re-assemble the secret",
+		Value:   2,
+	}
+	secretFlag = &cli.StringFlag{
+		Name:     "secret",
+		Aliases:  []string{"s"},
+		Usage:    "The secret to split into shards",
+		Required: true,
+	}
+	shardsFlag = &cli.StringSliceFlag{
+		Name:     "shard",
+		Aliases:  []string{"s"},
+		Usage:    "The shards to recombine into the secret",
+		Required: true,
+	}
+	quietFlag = &cli.BoolFlag{
+		Name:    "quiet",
+		Aliases: []string{"q"},
+		Usage:   "Suppress everything except the secret output",
+	}
 
-var encoder *base64.Encoding = base64.URLEncoding
-var secret, shardsCommaSep string
-var k, t int
-
-func init() {
-  flag.StringVar(&secret, "split", "", "The secret to split into shards")
-  flag.StringVar(&shardsCommaSep, "combine", "", "The shards to combine to get the secret separated by commas")
-  flag.IntVar(&k, "k", 3, "The number of total key shards")
-  flag.IntVar(&t, "t", 2, "The min number of shards needed to re-assemble the secret")
-  flag.Parse()
-}
+	app = &cli.Command{
+		Name:  "shamir-msg",
+		Usage: "Split and recombine a secret using Shamir's Secret Sharing",
+		Commands: []*cli.Command{
+			{
+				Name:  "split",
+				Usage: "Split a secret into shards",
+				Flags: []cli.Flag{keysFlag, thresholdFlag, secretFlag, quietFlag},
+				Action: func(ctx context.Context, cmd *cli.Command) error {
+					return runSplit(ctx, cmd)
+				},
+			},
+			{
+				Name:  "combine",
+				Usage: "Combine shards into the original secret",
+				Flags: []cli.Flag{shardsFlag, quietFlag},
+				Action: func(ctx context.Context, cmd *cli.Command) error {
+					return runCombine(ctx, cmd)
+				},
+			},
+			{
+				Name:  "run",
+				Usage: "Run the tool in interactive mode (default)",
+				Flags: []cli.Flag{},
+				Action: func(ctx context.Context, cmd *cli.Command) error {
+					return runInteractive(ctx, cmd)
+				},
+			},
+		},
+		DefaultCommand: "run",
+	}
+)
 
 func main() {
-  if len(secret) > 0 && len(shardsCommaSep) > 0 {
-    fmt.Println("ERROR: Cannot both split and combine in the same action")
-    flag.Usage()
-    os.Exit(1)
-  } else if len(secret) == 0 && len(shardsCommaSep) == 0 {
-    flag.Usage()
-    os.Exit(1)
-  }
+	if err := app.Run(context.Background(), os.Args); err != nil {
+		log.Fatal(err)
+	}
+}
 
-  // Split Command selected
-  if len(secret) > 0 {
-    keys, err := shamir.Split([]byte(secret), k, t)
-    if err != nil {
-      log.Fatalln(err)
-    }
+func printHeader() {
+	fmt.Printf("##### Shamir Secret Sharing Tool #####\n")
+	fmt.Printf("Split and recombine a secret using Shamir's Secret Sharing\n\n")
+}
 
-    for _, shard := range keys {
-      // RFC 4648 Encoding
-      encoded := encoder.EncodeToString(shard)
-      fmt.Println(encoded)
-    }
-  } else {
-    shards := strings.Split(shardsCommaSep, ",")
-    shardBytes := make([][]byte, len(shards))
-    for i, shard := range shards {
-      decodedShard, err := base64.URLEncoding.DecodeString(shard)
-      handleError(err)
-      shardBytes[i] = []byte(decodedShard)
-    }
+func runSplit(ctx context.Context, cmd *cli.Command) error {
+	quiet := cmd.Bool(quietFlag.Name)
+	if !quiet {
+		printHeader()
+	}
 
-    decodedSecret, err := shamir.Combine(shardBytes)
-    handleError(err)
-    fmt.Println(decodedSecret)
-  }
+	keys := cmd.Int(keysFlag.Name)
+	threshold := cmd.Int(thresholdFlag.Name)
+
+	shares, err := ShamirSplit(int(keys), int(threshold), cmd.String(secretFlag.Name))
+	if err != nil {
+		return err
+	}
+
+	if !quiet {
+		fmt.Printf("%v %v\n", color.HiBlackString("Total keys shards: "), color.HiWhiteString(fmt.Sprintf("%d", keys)))
+		fmt.Printf("%v %v\n", color.HiBlackString("Required for reconstruction: "), color.HiWhiteString(fmt.Sprintf("%d", threshold)))
+		fmt.Printf("\n")
+	}
+
+	for i, shard := range shares {
+		if !quiet {
+			fmt.Print(color.HiBlackString(fmt.Sprintf("Shard %d: ", i+1)))
+			color.HiWhite(shard)
+		} else {
+			fmt.Printf("%s\n", shard)
+		}
+	}
+
+	if !quiet {
+		fmt.Printf("\n")
+	}
+
+	return nil
+}
+
+func runCombine(ctx context.Context, cmd *cli.Command) error {
+	quiet := cmd.Bool(quietFlag.Name)
+	if !quiet {
+		printHeader()
+	}
+
+	secret, err := ShamirCombine(cmd.StringSlice(shardsFlag.Name))
+	if err != nil {
+		return err
+	}
+
+	if !quiet {
+		fmt.Print(color.HiBlackString("Secret: "))
+		color.HiWhite(secret)
+		fmt.Printf("\n")
+	} else {
+		fmt.Printf("%s\n", secret)
+	}
+
+	return nil
 }
