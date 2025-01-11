@@ -13,11 +13,6 @@ import (
 	"github.com/urfave/cli/v3"
 )
 
-type modeModel struct {
-	choices []string
-	cursor  int
-}
-
 func runInteractive(ctx context.Context, cmd *cli.Command) error {
 	printHeader()
 
@@ -32,7 +27,7 @@ func runInteractive(ctx context.Context, cmd *cli.Command) error {
 
 	mode, modeStr, err := prompt.Run()
 	if err != nil {
-		return fmt.Errorf("Mode selection failed %v", err)
+		return fmt.Errorf("mode selection failed %v", err)
 	}
 
 	//time.Sleep(50 * time.Millisecond)
@@ -51,7 +46,7 @@ func runInteractive(ctx context.Context, cmd *cli.Command) error {
 
 			shard, err := prompt.Run()
 			if err != nil {
-				return fmt.Errorf("Shard prompt failed %v", err)
+				return fmt.Errorf("shard prompt failed %v", err)
 			}
 
 			if shard == "" {
@@ -92,7 +87,7 @@ func runInteractive(ctx context.Context, cmd *cli.Command) error {
 
 		secret, err := prompt.Run()
 		if err != nil {
-			return fmt.Errorf("Secret prompt failed %v", err)
+			return fmt.Errorf("secret prompt failed %v", err)
 		}
 
 		fmt.Printf("%v %v\n", color.HiBlackString("Enter the secret to split:"), color.HiWhiteString(strings.Repeat("*", len(secret))))
@@ -100,7 +95,7 @@ func runInteractive(ctx context.Context, cmd *cli.Command) error {
 		validate := func(input string) error {
 			_, err := strconv.ParseInt(input, 10, 64)
 			if err != nil {
-				return errors.New("Invalid number")
+				return errors.New("invalid number")
 			}
 			return nil
 		}
@@ -113,7 +108,7 @@ func runInteractive(ctx context.Context, cmd *cli.Command) error {
 
 		keysStr, err := prompt.Run()
 		if err != nil {
-			return fmt.Errorf("Keys prompt failed %v", err)
+			return fmt.Errorf("keys prompt failed %v", err)
 		}
 
 		keys, _ := strconv.ParseInt(keysStr, 10, 64)
@@ -128,7 +123,7 @@ func runInteractive(ctx context.Context, cmd *cli.Command) error {
 
 		thresholdStr, err := prompt.Run()
 		if err != nil {
-			return fmt.Errorf("Threshold prompt failed %v", err)
+			return fmt.Errorf("threshold prompt failed %v", err)
 		}
 
 		threshold, _ := strconv.ParseInt(thresholdStr, 10, 64)
