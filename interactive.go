@@ -143,6 +143,8 @@ func runInteractive(ctx context.Context, cmd *cli.Command) error {
 		}
 
 		fmt.Printf("\n")
+		fmt.Printf("Press enter to exit\n")
+		fmt.Scanln()
 	}
 
 	return nil

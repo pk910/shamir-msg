@@ -78,81 +78,61 @@ jobs:
           Please read through the [wiki](https://github.com/ethpandaops/shamir-msg/wiki) for setup & configuration instructions.
           | Release File  | Description |
           | ------------- | ------------- |
-          | [shamir-msg_${{ inputs.version }}_windows_amd64.zip](https://github.com/pk910/shamir-msg/releases/download/v${{ inputs.version }}/shamir-msg_${{ inputs.version }}_windows_amd64.zip) | shamir-msg executable for windows/amd64 |
-          | [shamir-msg_${{ inputs.version }}_linux_amd64.tar.gz](https://github.com/pk910/shamir-msg/releases/download/v${{ inputs.version }}/shamir-msg_${{ inputs.version }}_linux_amd64.tar.gz) | shamir-msg executable for linux/amd64 |
-          | [shamir-msg_${{ inputs.version }}_linux_arm64.tar.gz](https://github.com/pk910/shamir-msg/releases/download/v${{ inputs.version }}/shamir-msg_${{ inputs.version }}_linux_arm64.tar.gz) | shamir-msg executable for linux/arm64 |
-          | [shamir-msg_${{ inputs.version }}_darwin_amd64.tar.gz](https://github.com/pk910/shamir-msg/releases/download/v${{ inputs.version }}/shamir-msg_${{ inputs.version }}_darwin_amd64.tar.gz) | shamir-msg executable for macos/amd64 |
-          | [shamir-msg_${{ inputs.version }}_darwin_arm64.tar.gz](https://github.com/pk910/shamir-msg/releases/download/v${{ inputs.version }}/shamir-msg_${{ inputs.version }}_darwin_arm64.tar.gz) | shamir-msg executable for macos/arm64 |
+          | [shamir-msg-win64.exe](https://github.com/pk910/shamir-msg/releases/download/v${{ inputs.version }}/shamir-msg-win64.exe) | shamir-msg executable for windows/amd64 |
+          | [shamir-msg-linux-amd64](https://github.com/pk910/shamir-msg/releases/download/v${{ inputs.version }}/shamir-msg-linux-amd64) | shamir-msg executable for linux/amd64 |
+          | [shamir-msg-linux-arm64](https://github.com/pk910/shamir-msg/releases/download/v${{ inputs.version }}/shamir-msg-linux-arm64) | shamir-msg executable for linux/arm64 |
+          | [shamir-msg-darwin-amd64](https://github.com/pk910/shamir-msg/releases/download/v${{ inputs.version }}/shamir-msg-darwin-amd64) | shamir-msg executable for macos/amd64 |
+          | [shamir-msg-darwin-arm64](https://github.com/pk910/shamir-msg/releases/download/v${{ inputs.version }}/shamir-msg-darwin-arm64) | shamir-msg executable for macos/arm64 |
       env:
         GITHUB_TOKEN: ${{ github.token }}
 
     # generate & upload release artifacts
-    - name: "Generate release package: shamir-msg_${{ inputs.version }}_windows_amd64.zip"
-      run: |
-        cd shamir-msg_windows_amd64
-        zip -r -q ../shamir-msg_${{ inputs.version }}_windows_amd64.zip .
-    - name: "Upload release artifact: shamir-msg_${{ inputs.version }}_windows_amd64.zip"
+    - name: "Upload release artifact: shamir-msg-win64.exe"
       uses: actions/upload-release-asset@v1
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./shamir-msg_${{ inputs.version }}_windows_amd64.zip
-        asset_name: shamir-msg_${{ inputs.version }}_windows_amd64.zip
+        asset_path: ./shamir-msg_windows_amd64/shamir-msg.exe
+        asset_name: shamir-msg-win64.exe
         asset_content_type: application/octet-stream
       env:
         GITHUB_TOKEN: ${{ github.token }}
     
-    - name: "Generate release package: shamir-msg_${{ inputs.version }}_linux_amd64.tar.gz"
-      run: |
-        cd shamir-msg_linux_amd64
-        tar -czf ../shamir-msg_${{ inputs.version }}_linux_amd64.tar.gz .
     - name: "Upload release artifact: shamir-msg_${{ inputs.version }}_linux_amd64.tar.gz"
       uses: actions/upload-release-asset@v1
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./shamir-msg_${{ inputs.version }}_linux_amd64.tar.gz
-        asset_name: shamir-msg_${{ inputs.version }}_linux_amd64.tar.gz
+        asset_path: ./shamir-msg_linux_amd64/shamir-msg
+        asset_name: shamir-msg-linux-amd64
         asset_content_type: application/octet-stream
       env:
         GITHUB_TOKEN: ${{ github.token }}
     
-    - name: "Generate release package: shamir-msg_${{ inputs.version }}_linux_arm64.tar.gz"
-      run: |
-        cd shamir-msg_linux_arm64
-        tar -czf ../shamir-msg_${{ inputs.version }}_linux_arm64.tar.gz .
-    - name: "Upload release artifact: shamir-msg_${{ inputs.version }}_linux_arm64.tar.gz"
+    - name: "Upload release artifact: shamir-msg-linux-arm64"
       uses: actions/upload-release-asset@v1
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./shamir-msg_${{ inputs.version }}_linux_arm64.tar.gz
-        asset_name: shamir-msg_${{ inputs.version }}_linux_arm64.tar.gz
+        asset_path: ./shamir-msg_linux_arm64/shamir-msg
+        asset_name: shamir-msg-linux-arm64
         asset_content_type: application/octet-stream
       env:
         GITHUB_TOKEN: ${{ github.token }}
     
-    - name: "Generate release package: shamir-msg_${{ inputs.version }}_darwin_amd64.tar.gz"
-      run: |
-        cd shamir-msg_darwin_amd64
-        tar -czf ../shamir-msg_${{ inputs.version }}_darwin_amd64.tar.gz .
-    - name: "Upload release artifact: shamir-msg_${{ inputs.version }}_darwin_amd64.tar.gz"
+    - name: "Upload release artifact: shamir-msg-darwin-amd64"
       uses: actions/upload-release-asset@v1
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./shamir-msg_${{ inputs.version }}_darwin_amd64.tar.gz
-        asset_name: shamir-msg_${{ inputs.version }}_darwin_amd64.tar.gz
+        asset_path: ./shamir-msg_darwin_amd64/shamir-msg
+        asset_name: shamir-msg-darwin-amd64
         asset_content_type: application/octet-stream
       env:
         GITHUB_TOKEN: ${{ github.token }}
 
-    - name: "Generate release package: shamir-msg_${{ inputs.version }}_darwin_arm64.tar.gz"
-      run: |
-        cd shamir-msg_darwin_arm64
-        tar -czf ../shamir-msg_${{ inputs.version }}_darwin_arm64.tar.gz .
-    - name: "Upload release artifact: shamir-msg_${{ inputs.version }}_darwin_arm64.tar.gz"
+    - name: "Upload release artifact: shamir-msg-darwin-arm64"
       uses: actions/upload-release-asset@v1
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./shamir-msg_${{ inputs.version }}_darwin_arm64.tar.gz
-        asset_name: shamir-msg_${{ inputs.version }}_darwin_arm64.tar.gz
+        asset_path: ./shamir-msg_darwin_arm64/shamir-msg
+        asset_name: shamir-msg-darwin-arm64
         asset_content_type: application/octet-stream
       env:
         GITHUB_TOKEN: ${{ github.token }}
