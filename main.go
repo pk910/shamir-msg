@@ -90,7 +90,9 @@ func main() {
 
 func printHeader() {
 	fmt.Printf("##### Shamir Secret Sharing Tool #####\n")
-	fmt.Printf("Split and recombine a secret using Shamir's Secret Sharing\n\n")
+	fmt.Printf("Split and recombine a secret using Shamir's Secret Sharing\n")
+	fmt.Printf("Version: %v\n", GetBuildVersion())
+	fmt.Printf("\n")
 }
 
 func runSplit(ctx context.Context, cmd *cli.Command) error {

@@ -1,0 +1,7 @@
+
+# final stage
+FROM debian:stable-slim
+WORKDIR /app
+COPY bin/* /app
+ENTRYPOINT ["./shamir-msg"]
+CMD []
